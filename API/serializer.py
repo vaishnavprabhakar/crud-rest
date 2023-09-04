@@ -53,13 +53,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         """
         Validate that the passwords match.
         """
-        password = data.get('password')
-        confirm_password = data.get('confirm_password')
+        password = self.data.get('password')
+        confirm_password = self.data.get('confirm_password')
 
         if password != confirm_password:
             raise serializers.as_serializer_error("Passwords do not match.")
         
-         
         return data
 
    

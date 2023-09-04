@@ -30,12 +30,11 @@ class RegisterApi(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return Response({"message" : "Welcome ! Register Your details here..."})
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=False)
-        user = serializer.save()
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
         return Response(
             {
-                "user" : CustomSerializer(user, context=self.get_serializer_context()).data,
                 "message" : "User created successfully. Now perform Login to get your token..."
             }
         )
