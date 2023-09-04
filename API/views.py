@@ -27,18 +27,19 @@ def get_token(user):
 class RegisterApi(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         return Response({"message" : "Welcome ! Register Your details here..."})
-    def post(self, request, *args, **kwargs):
+    def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(
-            {
-                "user" : CustomSerializer(user, context=self.get_serializer_context()).data,
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
                 "message" : "User created successfully. Now perform Login to get your token..."
-            }
-        )
+                }
+            )
+        
+        return Response({"msg": serializer.errors, "msg1": "something went wrong"}  )
     
 
 class ListUser(generics.ListAPIView):
@@ -57,15 +58,12 @@ class LoginApi(APIView):
     def post(self, request, format=None):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            print('jkdhajsbhbdj')
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
-            print(email, password)
             user = authenticate(email=email, password=password)
-            print(user)
             if user is not None:
                 tk = get_token(user)
-                print(tk)
+
             return Response({"token": tk,
                 "msg": "Login successfull" })
         return Response(

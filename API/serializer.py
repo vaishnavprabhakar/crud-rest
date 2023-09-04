@@ -42,25 +42,25 @@ class RegisterSerializer(serializers.ModelSerializer):
                                               style={'input_type' : 'password'})
     class Meta:
         model = CustomUser
-        fields = ('id', 'username', 'email', 'password','confirm_password')
+        fields = ('id','username', 'email', 'password','confirm_password')
         extra_kwargs = {
             'password' : {'write_only' : True},
             'confirm_password' : {'write_only' : True},
         }
 
     
-    def validate(self, data):
+    def validate(self, validated_data):
         """
         Validate that the passwords match.
         """
-        password = data.get('password')
-        confirm_password = data.get('confirm_password')
-
-        if password != confirm_password:
-            raise serializers.DjangoModelField('password', "Passwords do not match.")
         
-         
-        return data
+        password = validated_data.get('password')
+        confim_password = validated_data.get('confirm_password')
+        print(password, confim_password)
+        if password != confim_password:
+            raise serializers.ValidationError("Passwords do not match.")
+        else:
+            return password
 
    
     
