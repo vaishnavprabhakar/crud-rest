@@ -31,7 +31,7 @@ class RegisterApi(generics.GenericAPIView):
         return Response({"message" : "Welcome ! Register Your details here..."})
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        serializer.is_valid(raise_exception=False)
         user = serializer.save()
         return Response(
             {
@@ -57,15 +57,12 @@ class LoginApi(APIView):
     def post(self, request, format=None):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            print('jkdhajsbhbdj')
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
-            print(email, password)
             user = authenticate(email=email, password=password)
-            print(user)
             if user is not None:
                 tk = get_token(user)
-                print(tk)
+
             return Response({"token": tk,
                 "msg": "Login successfull" })
         return Response(

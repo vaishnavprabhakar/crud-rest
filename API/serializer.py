@@ -57,7 +57,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         confirm_password = data.get('confirm_password')
 
         if password != confirm_password:
-            raise serializers.DjangoModelField('password', "Passwords do not match.")
+            raise serializers.as_serializer_error("Passwords do not match.")
         
          
         return data
