@@ -37,7 +37,7 @@ class RegisterSerializer(serializers.ModelSerializer):
                                       
                                        style={'input_type' : 'password'})
     
-    confirm_password = serializers.CharField(help_text='Required. Must have 6 charector.',
+    confirm_password = serializers.CharField(help_text='Required. Must have 6 charector.',  # noqa: E501
                                              required=True,
 
                                               min_length=6, write_only=True, 
