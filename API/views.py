@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework import mixins
+from rest_framework import mixins 
 
 from rest_framework.response import Response
 from .serializer import RegisterSerializer,CustomSerializer, LoginSerializer, UpdateSerializer
@@ -8,7 +8,7 @@ from account.models import CustomUser
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework_simplejwt.authentication import JWTAuthentication
+# from rest_framework_simplejwt.authentication import JWTAuthentication 
 from django.contrib.auth import authenticate
 
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -31,14 +31,14 @@ class RegisterApi(generics.GenericAPIView):
         return Response({"message" : "Welcome ! Register Your details here..."})
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
             {
-                "user" : CustomSerializer(user, context=self.get_serializer_context()).data,
                 "message" : "User created successfully. Now perform Login to get your token..."
             }
         )
+        return Response(serializer.errors)
     
 
 class ListUser(generics.ListAPIView):
@@ -51,26 +51,24 @@ class ListUser(generics.ListAPIView):
 
 class LoginApi(APIView):
 
-    # queryset = CustomUser.objects.all()
 
     
     def post(self, request, format=None):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            print('jkdhajsbhbdj')
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
-            print(email, password)
+
             user = authenticate(email=email, password=password)
-            print(user)
+
             if user is not None:
                 tk = get_token(user)
-                print(tk)
-            return Response({"token": tk,
+                return Response({"token": tk,
                 "msg": "Login successfull" })
-        return Response(
-                {"msg": "something went wrong...!"}
+            return Response(
+                {"msg": "Doesn't exist. Or You must register new account"}
                 )
+        return Response(serializer.errors)
     
 
 class ProfileCreateAPI(APIView):
@@ -109,6 +107,5 @@ class ProfileCreateAPI(APIView):
             try:
                 CustomUser.objects.get(pk=id).delete()
             except CustomUser.DoesNotExist as e:
-                return Response({"User is deleted successfully. The user is not available"}, status=status.HTTP_204_NO_CONTENT)
-        return Response({"check the id given"}, status=status.HTTP_102_PROCESSING)
-        
+                return Response({"User is deleted successfully. The user is not available"}, status=status.HTTP_200_OK)  # noqa: E501
+        return Response({"check the id given"}, status=status.HTTP_400_BAD_REQUEST)
